@@ -1,7 +1,11 @@
 package com.accelerate.album.musicapi.model;
 
 import javax.persistence.*;
-import java.io.Serializable;
+
+
+/**
+ * @author Rashmi
+ */
 
 @Entity
 @Table(name = "album")

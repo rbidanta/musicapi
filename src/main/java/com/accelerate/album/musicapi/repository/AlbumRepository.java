@@ -10,6 +10,10 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
 
+/**
+ * @author Rashmi
+ */
+
 @RepositoryRestResource(collectionResourceRel = "album", path = "album")
 public interface AlbumRepository extends PagingAndSortingRepository<Album,Long> {
 

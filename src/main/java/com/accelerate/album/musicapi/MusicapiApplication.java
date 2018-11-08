@@ -3,6 +3,10 @@ package com.accelerate.album.musicapi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * @author Rashmi
+ */
+
 @SpringBootApplication
 public class MusicapiApplication {
 

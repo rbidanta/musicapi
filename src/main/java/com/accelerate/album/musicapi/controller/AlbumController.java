@@ -1,127 +1,122 @@
 package com.accelerate.album.musicapi.controller;
 
 import com.accelerate.album.musicapi.model.Album;
-import com.accelerate.album.musicapi.repository.AlbumRepository;
+import com.accelerate.album.musicapi.service.AlbumService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
 import java.util.*;
-import java.util.stream.Collectors;
+
+
+/**
+ * @author Rashmi
+ */
 
 @RestController
 @RequestMapping("/albums")
 public class AlbumController {
 
     @Autowired
-    AlbumRepository albumRepository;
+    AlbumService albumService;
 
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-
+    /**
+     * This is the HTTP route to create an {@link Album} in the database
+     * @param album This is an album object of type {@link Album}
+     * @return ResponseEntity<Object> Returns the ResponseEntity
+     */
     @RequestMapping(value = "/create" , method = RequestMethod.POST)
     public ResponseEntity<Object> addAlbum(@RequestBody Album album){
-        if (null!=album) {
-            album = albumRepository.save(album);
-
-            return new ResponseEntity(album,HttpStatus.OK);
+        Optional<Album> optionalAlbum = albumService.createAlbum(album);
+        if(optionalAlbum.isPresent()){
+            return new ResponseEntity((Album)optionalAlbum.get(),HttpStatus.OK);
+        }else{
+            return new ResponseEntity("Failure",HttpStatus.BAD_REQUEST);
         }
-        else {
-            return ResponseEntity.badRequest().build();
-        }
-
     }
 
+    /**
+     * This the HTTP route to delete an {@link Album} in the database
+     * @param id This is the identifying parameter for the Album to be deleted
+     * @return ResponseEntity<Object> Returns the ResponseEntity:
+     *         Success for success
+     *         Failure for Failure
+     */
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public String deleteAlbum(@PathVariable long id){
-        Album album = albumRepository.findAlbumById(id);
-        if (null != album){
-            albumRepository.delete(album);
-        }
-        else{
-            return "Failure";
-        }
-        return "Success";
+    public ResponseEntity<Object> deleteAlbum(@PathVariable long id){
+            Optional<Album> optionalAlbum = albumService.deleteAlbum(id);
+            if(optionalAlbum.isPresent()){
+                return new ResponseEntity("Success",HttpStatus.OK);
+            }else{
+                return new ResponseEntity("Failure",HttpStatus.BAD_REQUEST);
+            }
     }
 
+    /**
+     * This the HTTP route to update an {@link Album} in the database
+     * @param id This is the identifying parameter for the Album to be deleted
+     * @param album These are album properties as JSON object
+     * @return ResponseEntity<Object> Returns the ResponseEntity
+     */
     @RequestMapping(value = "/update/{id}",method = RequestMethod.PUT)
     public ResponseEntity<Object> updateAlbum(@PathVariable long id , @RequestBody Album album){
 
-        Optional<Album> albumOptional = albumRepository.findById(id);
-        if(!albumOptional.isPresent())
+        Optional<Object> optionalAlbum = albumService.updateAlbum(id,album);
+        if (optionalAlbum.isPresent()){
+            return new ResponseEntity((Album)optionalAlbum.get(),HttpStatus.OK);
+        }else{
             return ResponseEntity.notFound().build();
-        album.setId(id);
-        albumRepository.save(album);
-        return new ResponseEntity(album,HttpStatus.OK);
+        }
     }
 
+    /**
+     * This Route provides the album as a JSON object
+     * @param id This is the identifying parameter for the Album
+     * @return ResponseEntity<Object> Returns the ResponseEntity
+     */
     @RequestMapping(value = "/find/{id}" , method = RequestMethod.GET)
     public ResponseEntity<Object> fetchAlbum(@PathVariable long id){
-        Album album = albumRepository.findAlbumById(id);
-        if (null != album)
+        Album album = albumService.fethcAlbum(id);
+        if (null != album){
             return new ResponseEntity(album,HttpStatus.OK);
-        else
-            return new ResponseEntity("Failure: Unable to locate the album",HttpStatus.BAD_REQUEST);
+        }else {
+            return new ResponseEntity("Failure", HttpStatus.BAD_REQUEST);
+        }
     }
 
+    /**
+     * This Route provides the all the Albums produced by {@param artist}
+     * @param artist This is the name of the Artist
+     * @return List of {@link Album} objects as a ResponseEntity
+     */
     @RequestMapping(value="/findbyartist/{artist}",method = RequestMethod.GET)
     public ResponseEntity<Object> fetchAlbumByArtist(@PathVariable String artist){
-        List<Album> albums = albumRepository.findAlbumByArtist(artist);
+        List<Album> albums = albumService.fetchAlbumByArtist(artist);
         return new ResponseEntity<Object>(albums,HttpStatus.OK);
     }
 
-
+    /**
+     * This Route provides the list of all the artists in the system
+     * @return List of all the artists in the system
+     */
     @RequestMapping(value="/allartist",method = RequestMethod.GET)
     public ResponseEntity<Object> getAllArtist(){
-        List<String> artists = new ArrayList<String>();
-        jdbcTemplate.query("SELECT distinct artist FROM ALBUM", new ResultSetExtractor<Object>() {
-            @Override
-            public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
-                while (rs.next()){
-                    String name = rs.getString("artist");
-                    artists.add(name);
-                }
-                return artists;
-            }
-        });
-        Collections.sort(artists);
+        List<String> artists = albumService.getArtists();
         return new ResponseEntity<Object>(artists,HttpStatus.OK);
     }
 
+    /**
+     * This Route provides the Statistics about the albums
+     * @param type This is the parameter that decides on the statistics
+     *             1 provides the ranking for Number of Albums produced by artist
+     *             0 provides the ranking for Albums produced by the years
+     * @return ResponseEntity
+     */
     @RequestMapping(value="/stats/{type}",method = RequestMethod.GET)
     public ResponseEntity<Object> getTrends(@PathVariable int type){
-        Map<String,Integer> stats = new HashMap();
-
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*),");
-                            sql.append(type == 1 ? " genre":" year");
-                            sql.append(" from album group by");
-                            sql.append(type == 1 ? " genre":" year");
-                            sql.append(" order by 1 desc");
-
-        jdbcTemplate.query(sql.toString(), new ResultSetExtractor<Object>() {
-            @Override
-            public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
-                while (rs.next()){
-                    Integer occurrence = rs.getInt(1);
-                    String key = rs.getString(type == 1 ? "genre":"year");
-                    stats.put(key,occurrence);
-                }
-                return stats;
-            }
-        });
-
-        Map<String,Integer> sorted = stats.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
-                        LinkedHashMap::new));
-        return new ResponseEntity<Object>(sorted,HttpStatus.OK);
+        Map<String, Integer> trends = albumService.getTrends(type);
+        return new ResponseEntity<Object>(trends,HttpStatus.OK);
     }
 }
