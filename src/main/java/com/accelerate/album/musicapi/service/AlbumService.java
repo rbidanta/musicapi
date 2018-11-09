@@ -31,9 +31,10 @@ public class AlbumService {
 
 
     /**
-     *
-     * @param album
-     * @return
+     * This function takes an album object and creates an entry in the database
+     * In this case in H2 Database
+     * @param album This is the parameter the function takes {@link Album}
+     * @return Optional<Album> object of Album type
      */
     public Optional<Album> createAlbum(Album album){
         Optional<Album> optionalAlbum = Optional.of(albumRepository.save(album));
@@ -41,9 +42,9 @@ public class AlbumService {
     }
 
     /**
-     *
-     * @param id
-     * @return
+     * This function deletes the album from the H2 Database
+     * @param id this is a long type Id that uniquely identifies an Album
+     * @return Optional<Album> object of Album type
      */
     public Optional<Album> deleteAlbum(long id){
         Optional<Album> optionalAlbum = Optional.of(albumRepository.findAlbumById(id));
@@ -55,10 +56,10 @@ public class AlbumService {
 
 
     /**
-     *
-     * @param id
-     * @param album
-     * @return
+     * This function updates the album entry in the H2 Database
+     * @param id this is a long type Id that uniquely identifies an Album
+     * @param album the JSON formated properties to be updated in the album
+     * @return Optional<Album> object of Album type
      */
     public Optional<Object> updateAlbum(long id, Album album){
         Optional<Album> albumOptional = albumRepository.findById(id);
@@ -71,9 +72,9 @@ public class AlbumService {
 
 
     /**
-     *
-     * @param id
-     * @return
+     * This function fetches the album entry from the H2 Database
+     * @param id this is a long type Id that uniquely identifies an Album
+     * @return Album object
      */
     public Album fethcAlbum(long id){
         Album album = albumRepository.findAlbumById(id);
@@ -81,9 +82,9 @@ public class AlbumService {
     }
 
     /**
-     *
-     * @param artist
-     * @return
+     * This function fetches the albums entry from the H2 Database for a particular Artist
+     * @param artist this is a name of the artist
+     * @return List of all the albums the artist has produced
      */
     public List<Album> fetchAlbumByArtist(String artist){
         List<Album> albums = albumRepository.findAlbumByArtist(artist);
@@ -91,8 +92,8 @@ public class AlbumService {
     }
 
     /**
-     *
-     * @return
+     * This function fetches all the artists entry from the H2 Database
+     * @return List of all the artists sorted in alphabetical order
      */
     public List<String> getArtists(){
         List<String> artists = new ArrayList<String>();
@@ -112,9 +113,10 @@ public class AlbumService {
 
 
     /**
-     *
-     * @param type
-     * @return
+     * This function provides some trends on albums from the H2 Database
+     * @param type This signifies if the trend shought is by genre or by year for the albums
+     * @return Map of Genre as key and Count as value of if type is 1 else Year as key and
+     * Count as value if type is otherwise
      */
     public Map<String,Integer> getTrends(int type){
 
