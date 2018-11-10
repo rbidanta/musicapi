@@ -76,9 +76,9 @@ public class AlbumService {
      * @param id this is a long type Id that uniquely identifies an Album
      * @return Album object
      */
-    public Album fethcAlbum(long id){
+    public Optional<Album> fethcAlbum(long id){
         Album album = albumRepository.findAlbumById(id);
-        return album;
+        return Optional.of(album);
     }
 
     /**

@@ -33,7 +33,7 @@ public class AlbumController {
         if(optionalAlbum.isPresent()){
             return new ResponseEntity((Album)optionalAlbum.get(),HttpStatus.OK);
         }else{
-            return new ResponseEntity("Failure",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("{\"status\":\"Unable to Create Album\"}",HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -48,9 +48,9 @@ public class AlbumController {
     public ResponseEntity<Object> deleteAlbum(@PathVariable long id){
             Optional<Album> optionalAlbum = albumService.deleteAlbum(id);
             if(optionalAlbum.isPresent()){
-                return new ResponseEntity("Success",HttpStatus.OK);
+                return new ResponseEntity("{\"status\":\"Album Deleted\"}",HttpStatus.OK);
             }else{
-                return new ResponseEntity("Failure",HttpStatus.BAD_REQUEST);
+                return new ResponseEntity("{\"status\":\"Album not found\"}",HttpStatus.BAD_REQUEST);
             }
     }
 
@@ -67,7 +67,7 @@ public class AlbumController {
         if (optionalAlbum.isPresent()){
             return new ResponseEntity((Album)optionalAlbum.get(),HttpStatus.OK);
         }else{
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity("{\"status\":\"Album not found\"}", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -78,11 +78,11 @@ public class AlbumController {
      */
     @RequestMapping(value = "/find/{id}" , method = RequestMethod.GET)
     public ResponseEntity<Object> fetchAlbum(@PathVariable long id){
-        Album album = albumService.fethcAlbum(id);
-        if (null != album){
+        Optional<Album> album = albumService.fethcAlbum(id);
+        if (album.isPresent()){
             return new ResponseEntity(album,HttpStatus.OK);
         }else {
-            return new ResponseEntity("Failure", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("{\"status\":\"Failure\"}", HttpStatus.BAD_REQUEST);
         }
     }
 

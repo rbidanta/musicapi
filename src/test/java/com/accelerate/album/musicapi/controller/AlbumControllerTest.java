@@ -34,7 +34,7 @@ public class AlbumControllerTest {
     private AlbumService albumService;
 
     @Test
-    public void addAlbum() throws Exception {
+    public void addAlbum_WhenCreated() throws Exception {
 
         Album mockAlbum = new Album( "Slippery When Wet","Bon Jovi","Rock",1986);
 
@@ -58,7 +58,30 @@ public class AlbumControllerTest {
     }
 
     @Test
-    public void deleteAlbum() throws Exception {
+    public void addAlbum_WhenNotCreated() throws Exception {
+
+
+        String mockAlbumJson = "{\"name\":\"Slippery When Wet\",\"artist\":\"Bon Jovi\",\"genre\":\"Rock\",\"year\":1986}";
+
+        Mockito.when(
+                albumService.createAlbum(
+                        Mockito.any(Album.class))).thenReturn(Optional.empty());
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/albums/create")
+                .accept(MediaType.APPLICATION_JSON).content(mockAlbumJson)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+        MockHttpServletResponse response = result.getResponse();
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+
+    }
+
+    @Test
+    public void deleteAlbum_ifAlbumPresent() throws Exception {
 
         Album mockAlbum = new Album( "Slippery When Wet","Bon Jovi","Rock",1986);
 
@@ -79,7 +102,28 @@ public class AlbumControllerTest {
     }
 
     @Test
-    public void updateAlbum() throws Exception {
+    public void deleteAlbum_ifAlbumNotPresent() throws Exception {
+
+
+        Mockito.when(
+                albumService.deleteAlbum(
+                        Mockito.anyLong())).thenReturn(Optional.empty());
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .delete("/albums/delete/103")
+                .accept(MediaType.APPLICATION_JSON);
+
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(),result.getResponse().getStatus());
+
+
+    }
+
+
+
+    @Test
+    public void updateAlbum_WhenAlbumExists() throws Exception {
         Album mockAlbum = new Album( "Slippery When Wet","Bon Jovi","Rock",1986);
 
         String mockAlbumJson = "{\"name\":\"Slippery When Wet\",\"artist\":\"Bon Jovi\",\"genre\":\"Rock/Pop\",\"year\":1986}";
@@ -98,12 +142,34 @@ public class AlbumControllerTest {
         assertEquals(HttpStatus.OK.value(),result.getResponse().getStatus());
     }
 
+
     @Test
-    public void fetchAlbum() throws Exception {
+    public void updateAlbum_WhenAlbumDoesNotExist() throws Exception {
+
+        String mockAlbumJson = "{\"name\":\"Slippery When Wet\",\"artist\":\"Bon Jovi\",\"genre\":\"Rock/Pop\",\"year\":1986}";
+
+        Mockito.when(
+                albumService.updateAlbum(
+                        Mockito.anyLong(),Mockito.any(Album.class))).thenReturn(Optional.empty());
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put("/albums/update/105")
+                .accept(MediaType.APPLICATION_JSON).content(mockAlbumJson)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(),result.getResponse().getStatus());
+    }
+
+    @Test
+    public void fetchAlbum_whenIdIsGiven() throws Exception {
         Album mockAlbum = new Album( "Slippery When Wet","Bon Jovi","Rock",1986);
         mockAlbum.setId(103);
 
-        Mockito.when(albumService.fethcAlbum(Mockito.anyLong())).thenReturn(mockAlbum);
+        Optional<Album> optionalAlbum = Optional.of(mockAlbum);
+
+        Mockito.when(albumService.fethcAlbum(Mockito.anyLong())).thenReturn(optionalAlbum);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
                 "/albums/find/103").accept(MediaType.APPLICATION_JSON);
@@ -114,6 +180,21 @@ public class AlbumControllerTest {
 
         JSONAssert.assertEquals(expected, result.getResponse()
                 .getContentAsString(), false);
+    }
+
+    @Test
+    public void fetchAlbum_whenIdNotGiven() throws Exception {
+
+        Mockito.when(albumService.fethcAlbum(Mockito.anyLong())).thenReturn(Optional.empty());
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
+                "/albums/find/105").accept(MediaType.APPLICATION_JSON);
+
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+        JSONAssert.assertEquals("{\"status\":\"Failure\"}", result.getResponse()
+                .getContentAsString(), false);
+        assertEquals(HttpStatus.BAD_REQUEST.value(),result.getResponse().getStatus());
     }
 
     @Test
