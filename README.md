@@ -188,11 +188,11 @@ GET http://localhost:8080/albums/stats/0
 java -jar /build/libs/musicapi-0.1.0.jar
 ```
 - The application will run on port number 8080 and can be accessed using
-[https://localhost:8080/albums/](https://localhost:8080/albums/) as the base context
+[https://localhost:8080/albums/](http://localhost:8080/albums/) as the base context
 
 ### Option 2
 - Clone the project from [github](https://github.com/rbidanta/musicapi)
-- Make sure to install latest version of [gradle](https://gradle.org/install/) using the following command or any other package manager
+- Make sure to install latest version of [gradle](http://gradle.org/install/) using the following command or any other package manager
 ```
 brew install gradle
 ```
