@@ -126,7 +126,6 @@ public class AlbumService {
         sql.append(type == 1 ? " genre":" year");
         sql.append(" from album group by");
         sql.append(type == 1 ? " genre":" year");
-        sql.append(" order by 1 desc");
 
         jdbcTemplate.query(sql.toString(), new ResultSetExtractor<Object>() {
             @Override
