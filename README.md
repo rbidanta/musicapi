@@ -21,6 +21,7 @@ Content Type: JSON
 
 **Response:**
 ```
+HTTP STATUS: 200
 {
     "id": 104,
     "name": "Good Bye & Good Riddance",
@@ -37,6 +38,7 @@ GET http://localhost:8080/albums/find/103
 ```
 **Response:**
 ```
+HTTP STATUS: 200
 {
     "id": 103,
     "name": "Sgt Pepper's Lonely Hearts Club Band",
@@ -63,6 +65,7 @@ Content Type: JSON
 ```
 **Response:**
 ```
+HTTP STATUS: 200
 {
     "id": 104,
     "name": "Good Bye & Good Riddance",
@@ -78,7 +81,8 @@ DELETE http://localhost:8080/albums/delete/104
 ```
 **Response:**
 ```
-success
+HTTP STATUS: 200
+{"status":"Album Deleted"}
 ```
 #### List of all Artists
 **Request:**
@@ -86,7 +90,9 @@ success
 GET http://localhost:8080/albums/allartist
 ```
 **Response:**
+
 ```
+HTTP STATUS: 200
 [
     "Aerosmith",
     "Air",
@@ -110,6 +116,7 @@ GET http://localhost:8080/albums/findbyartist/Bob%20Marley
 ```
 **Response:**
 ```
+HTTP STATUS: 200
 [
     {
         "id": 63,
@@ -134,6 +141,7 @@ GET http://localhost:8080/albums/stats/1
 ```
 **Response:**
 ```
+HTTP STATUS: 200
 {
     "Alternative": 24,
     "Rock": 20,
@@ -156,6 +164,7 @@ GET http://localhost:8080/albums/stats/0
 ```
 **Response:**
 ```
+HTTP STATUS: 200
 {   
     "2016":9,
     "1994":6,

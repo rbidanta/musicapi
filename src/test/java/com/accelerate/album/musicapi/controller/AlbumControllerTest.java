@@ -81,7 +81,7 @@ public class AlbumControllerTest {
     }
 
     @Test
-    public void deleteAlbum_ifAlbumPresent() throws Exception {
+    public void deleteAlbum_WhenAlbumPresent() throws Exception {
 
         Album mockAlbum = new Album( "Slippery When Wet","Bon Jovi","Rock",1986);
 
@@ -102,7 +102,7 @@ public class AlbumControllerTest {
     }
 
     @Test
-    public void deleteAlbum_ifAlbumNotPresent() throws Exception {
+    public void deleteAlbum_WhenAlbumNotPresent() throws Exception {
 
 
         Mockito.when(
@@ -114,7 +114,8 @@ public class AlbumControllerTest {
                 .accept(MediaType.APPLICATION_JSON);
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-
+        JSONAssert.assertEquals("{\"status\":\"Album Not Found\"}", result.getResponse()
+                .getContentAsString(), false);
         assertEquals(HttpStatus.BAD_REQUEST.value(),result.getResponse().getStatus());
 
 
@@ -158,12 +159,13 @@ public class AlbumControllerTest {
                 .contentType(MediaType.APPLICATION_JSON);
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-
+        JSONAssert.assertEquals("{\"status\":\"Album Not Found\"}", result.getResponse()
+                .getContentAsString(), false);
         assertEquals(HttpStatus.BAD_REQUEST.value(),result.getResponse().getStatus());
     }
 
     @Test
-    public void fetchAlbum_whenIdIsGiven() throws Exception {
+    public void fetchAlbum_WhenIdIsGiven() throws Exception {
         Album mockAlbum = new Album( "Slippery When Wet","Bon Jovi","Rock",1986);
         mockAlbum.setId(103);
 
@@ -183,7 +185,7 @@ public class AlbumControllerTest {
     }
 
     @Test
-    public void fetchAlbum_whenIdNotGiven() throws Exception {
+    public void fetchAlbum_WhenIdNotGiven() throws Exception {
 
         Mockito.when(albumService.fethcAlbum(Mockito.anyLong())).thenReturn(Optional.empty());
 
@@ -192,7 +194,7 @@ public class AlbumControllerTest {
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-        JSONAssert.assertEquals("{\"status\":\"Failure\"}", result.getResponse()
+        JSONAssert.assertEquals("{\"status\":\"Album Not Found\"}", result.getResponse()
                 .getContentAsString(), false);
         assertEquals(HttpStatus.BAD_REQUEST.value(),result.getResponse().getStatus());
     }

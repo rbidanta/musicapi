@@ -37,7 +37,7 @@ public class AlbumService {
      * @return Optional<Album> object of Album type
      */
     public Optional<Album> createAlbum(Album album){
-        Optional<Album> optionalAlbum = Optional.of(albumRepository.save(album));
+        Optional<Album> optionalAlbum = Optional.ofNullable(albumRepository.save(album));
         return optionalAlbum;
     }
 
@@ -47,11 +47,14 @@ public class AlbumService {
      * @return Optional<Album> object of Album type
      */
     public Optional<Album> deleteAlbum(long id){
-        Optional<Album> optionalAlbum = Optional.of(albumRepository.findAlbumById(id));
+        Optional<Album> optionalAlbum = albumRepository.findById(id);
         if (optionalAlbum.isPresent()){
             albumRepository.delete(optionalAlbum.get());
+            return optionalAlbum;
+        }else{
+            return Optional.empty();
         }
-        return optionalAlbum;
+
     }
 
 
@@ -61,7 +64,7 @@ public class AlbumService {
      * @param album the JSON formated properties to be updated in the album
      * @return Optional<Album> object of Album type
      */
-    public Optional<Object> updateAlbum(long id, Album album){
+    public Optional<Album> updateAlbum(long id, Album album){
         Optional<Album> albumOptional = albumRepository.findById(id);
         if(!albumOptional.isPresent())
             return Optional.empty();
@@ -78,7 +81,11 @@ public class AlbumService {
      */
     public Optional<Album> fethcAlbum(long id){
         Album album = albumRepository.findAlbumById(id);
-        return Optional.of(album);
+        if(null!=album){
+            return Optional.of(album);
+        }else{
+            return Optional.empty();
+        }
     }
 
     /**
