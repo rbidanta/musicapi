@@ -77,7 +77,7 @@ public class AlbumService {
     /**
      * This function fetches the album entry from the H2 Database
      * @param id this is a long type Id that uniquely identifies an Album
-     * @return Album object
+     * @return Optional<Album> object of Album type
      */
     public Optional<Album> fethcAlbum(long id){
         Album album = albumRepository.findAlbumById(id);
